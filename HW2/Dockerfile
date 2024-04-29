@@ -1,32 +1,20 @@
-# Docker-команда FROM вказує базовий образ контейнера
-# Наш базовий образ - це Linux з попередньо встановленим python-3.10
-FROM python:3.12.2
+# Use an explicit base image tag
+FROM python:3.12.2-slim
 
-# Встановимо змінну середовища
-ENV APP_HOME /app
-
-# Install system dependencies
-#RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-RUN pip install 'poetry==1.8.2'
+# Set the working directory
+WORKDIR /app
 
 # Install Poetry
-#RUN curl -sSL https://install.python-poetry.org | python -
+RUN pip install 'poetry==1.8.2'
 
-# Встановимо робочу директорію всередині контейнера
-WORKDIR $APP_HOME
-
-# Copy the poetry files
+# Copy dependency files
 COPY pyproject.toml poetry.lock ./
 
-# Встановимо залежності всередині контейнера
-RUN poetry install 
+# Install dependencies
+RUN poetry install
 
-# Скопіюємо інші файли в робочу директорію контейнера
+# Copy the rest of your code
 COPY . .
 
-# Позначимо порт, де працює застосунок всередині контейнера
-EXPOSE 5000
-
-# Запустимо наш застосунок всередині контейнера
+# Specify the default command
 ENTRYPOINT ["python", "main.py"]
